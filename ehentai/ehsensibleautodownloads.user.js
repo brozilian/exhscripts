@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0.3
+// @version        1.0.4
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -585,11 +585,12 @@ window.addEventListener('load', function() {
 		// Positioning
 		'.id3 > a, #gd1 > div { position: relative; display: flex; max-height: 100%; }' +
 		'#gd1 > div > .downloadLink { right: -1px !important; }' +
-       		'div.it4 { position: absolute!important; right: 0px!important; }' + //compensating for buttons
-      		'div.it5 { position: absolute!important; left: 48px!important; }' +
-      		'div.i { display:none!important; }' + 
-    		'div.in { margin-left: -28px !important; margin-top: 3px!important; background: linear-gradient(to left, black, transparent) !important; }' + 
-    		'div.it3 { margin-top: -6px!important; }' +
+		'div.it4 { position: absolute!important; right: 0px!important; }' + //compensating for buttons
+		'div.it5 { position: absolute!important; left: 48px!important; height: 14px !important;}' +
+		'div.i {  margin-left: -16px!important; }' + 
+		'div.in { margin-left: -42px!important; margin-top: 3px!important; background: black!important; }' + 
+		'div.it3 { margin-top: -6px!important; }' +
+		'td.itu {overflow: hidden !important; position: absolute !important; height: 14px !important;}' +
 		// Backgrounds
 		'.automatedButton { background-size: 20px 20px; background-position: 5px 5px; background-repeat: no-repeat; }' +
 		'.automatedPicker { background-size: 12px 12px; background-position: 2px 2px; background-repeat: no-repeat; }' +
