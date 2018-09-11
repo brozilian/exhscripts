@@ -256,6 +256,24 @@ function confirmDownloadRequest(data) {
 	});
 }
 
+function confirmDownloadRequestResized(data) {
+	return xhr({
+		method: 'GET',
+		url: format('{0}//{1}/archiver.php?gid={2}&token={3}&or={4}',
+			window.location.protocol, window.location.host, data.galleryId, data.galleryToken,
+			data.archiverKey.replace(/--/, '-'))
+	})
+	.then(function(response) {
+      	var div = parseHTML(response.responseText);
+		var cost = document.evaluate("/div[1]/div[1]/div[2]/div/strong", div, null, 9, null).singleNodeValue.textContent.trim();
+		var size = document.evaluate("/div[1]/div[1]/div[2]/p/strong", div, null, 9, null).singleNodeValue.textContent.trim();
+		var proceed = confirm(format('Size: {0}\nCost: {1}\n\nProceed?', size, cost));
+		if (proceed) return data;
+		data.error = 'aborted';
+		return Promise.reject(data);
+	});
+}
+
 function submitDownloadRequest(data) {
 	return xhr({
 		method: 'POST',
@@ -442,7 +460,7 @@ async function requestDownloadResized(e) {
 		} else { 
 			archiveQueue[galleryId] = { token: galleryToken, button: e.target };
 			var promise = obtainArchiverKey({ galleryId: galleryId, galleryToken: galleryToken, isTorrent: false });
-			if (askConfirmation) promise = promise.then(confirmDownloadRequest);
+			if (askConfirmation) promise = promise.then(confirmDownloadRequestResized);
 			promise
 				.then(submitDownloadRequestResized)
 				.then(waitForDownloadLink)
@@ -551,8 +569,6 @@ window.addEventListener('load', function() {
 			parent: rows[n].parentNode.previousSibling 
 		});
 		
-		rows[n].parentNode.style.maxWidth = "430px"; // need to set width to compensate icons
-
 	}
 
 	// document style
@@ -569,6 +585,10 @@ window.addEventListener('load', function() {
 		// Positioning
 		'.id3 > a, #gd1 > div { position: relative; display: flex; max-height: 100%; }' +
 		'#gd1 > div > .downloadLink { right: -1px !important; }' +
+        'div.it4 { position: absolute!important; right: 0px!important; }' + //compensating for buttons
+        'div.it5 { position: absolute!important; left: 48px!important; }' +
+        'div.i { display:none!important; }' + 
+        'div.it3 { margin-top: -6px!important; }' +
 		// Backgrounds
 		'.automatedButton { background-size: 20px 20px; background-position: 5px 5px; background-repeat: no-repeat; }' +
 		'.automatedPicker { background-size: 12px 12px; background-position: 2px 2px; background-repeat: no-repeat; }' +
