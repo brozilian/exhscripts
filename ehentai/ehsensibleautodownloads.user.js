@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0.1
+// @version        1.0.2
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
