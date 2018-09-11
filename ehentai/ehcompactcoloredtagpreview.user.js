@@ -3,7 +3,7 @@
 // @description	   When you hover over a gallery it shows the tags, pink for female blue for male. More compact. Also shows number of pages!
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0
+// @version        1.1
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
