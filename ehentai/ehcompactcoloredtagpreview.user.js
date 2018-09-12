@@ -3,11 +3,12 @@
 // @description	   When you hover over a gallery it shows the tags, pink for female blue for male. More compact. Also shows number of pages!
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.1
+// @version        1.2
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
 // @include        https://exhentai.org/*
+// @require        https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 //Based off of DP's v0.4.3.0 https://sleazyfork.org/en/scripts/24442-custom-exhentai-g-e-hentai-tags-preview, remainder of comments from that version kept below
 
@@ -92,19 +93,7 @@ https://greasyfork.org/en/scripts/21167-eh-tag-exposer-and-hider/code
 + good reference in terms of figuring out how to format and style the box
 */
 
-
-function addJQuery(callback) {
-	var script = document.createElement("script");
-	script.setAttribute("src", "https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js");
-	script.addEventListener('load', function() {
-		var script = document.createElement("script");
-		script.textContent = "(" + callback.toString() + ")();";
-		document.body.appendChild(script);
-	}, false);
-	document.body.appendChild(script);
-}
-
-function main() {
+ 
 	$('body').append('<div id="info_div">Loading...</div>');
 	$('#info_div').hide()
 	.css('position', 'absolute')
@@ -206,6 +195,3 @@ function main() {
 		
         $('#info_div').html("<span style='font-weight: bold;'>" + title + "</span><div style='margin-top: 2px; margin-bottom: 2px; height: 1px; background-color: " + color + ";'></div>" + index);
     }
-}
-
-addJQuery(main);
