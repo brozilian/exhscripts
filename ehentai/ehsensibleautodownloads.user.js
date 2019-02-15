@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0.5
+// @version        1.0.6
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -224,7 +224,7 @@ function obtainTorrentFile(data) {
 			seeds = parseInt(findValue('Seeds'), 10) || 0;
 			size = parseFloat(size, 10) * (/MB/i.test(size) ? 1024 : (/GB/i.test(size) ? 1024 * 1024 : 1));
 			// Ignore torrents with invalid sizes or no seeds or older than newest update
-			if (size === 0 || size > data.size || size > (imageSizeLimit * data.length) || seeds === 0 || (posted < data.date)) continue;
+			if (size === 0 || size > (data.size * 1.05) || size > (imageSizeLimit * data.length) || seeds === 0 || (posted < data.date)) continue;
 			candidates.push({ link: link.href, date: posted, size: size, seeds: seeds });
 		}
 		if (candidates.length === 0) data.error = 'could not find any suitable torrent';
