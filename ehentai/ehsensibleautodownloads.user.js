@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0.6
+// @version        1.0.7
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -484,29 +484,126 @@ async function requestDownloadResized(e) {
   --------*/
 
 window.addEventListener('load', function() {
+  
+    document.querySelectorAll('.gl3m, .gl3c, .gl1e').forEach((button) => {button.onclick = null});
 
-	// button generation (thumbnail list)
-	var thumbnails = document.querySelectorAll('.id3 > a'), n = thumbnails.length;
+    // button generation (thumbnail)
+    var thumbnails = document.querySelectorAll('.gl3t'), n = thumbnails.length;
 	while (n-- > 0) {
 		createButton({
 			title: 'Automated download',
-			target: thumbnails[n].href,
+			target: thumbnails[n].querySelector('a').href,
 			className: 'automatedButton downloadLink',
 			onClick: requestDownloadResized,
-			style: { bottom: 0, right: 0 },
+			style: { bottom: 0, right: -2 },
 			parent: thumbnails[n]
 		});
 		createButton({
 			title: 'Torrent download',
-			target: thumbnails[n].href,
+			target: thumbnails[n].querySelector('a').href,
 			className: 'automatedButton torrentLink',
 			onClick: requestDownloadResized,
-			style: { bottom: 0, left: 1 },
+			style: { bottom: 0, left: -1 },
 			parent: thumbnails[n]
 		});
 	}
 
+
+	// button generation (extended)
+	var erows = document.querySelectorAll('.gl1e > div > a'), n = erows.length;
+	while (n-- > 0) {
+		createButton({
+			type: 'div',
+			title: 'Automated Resized download',
+			target: erows[n].href,
+			className: 'automatedInline downloadLink',
+			onClick: requestDownloadResized,
+            style: { bottom: 0, right: -51 },
+			parent: erows[n].parentNode.parentNode.nextSibling.firstChild.firstChild.lastChild
+		});
+		createButton({
+			type: 'div',
+			title: 'Torrent download', 
+			target: erows[n].href,
+			className: 'automatedInline torrentLink',
+			onClick: requestDownloadResized,
+            style: { bottom: 0, right: -28 },
+			parent: erows[n].parentNode.parentNode.nextSibling.firstChild.firstChild.lastChild
+		});
+		
+	}
+  
+	// button generation (compact)
+	var crows = document.querySelectorAll('.gl3c > div > a'), n = crows.length;
+	while (n-- > 0) {
+		createButton({
+			type: 'div',
+			title: 'Automated Resized download',
+			target: crows[n].href,
+			className: 'automatedInline downloadLink',
+			onClick: requestDownloadResized,
+            style: { bottom: 0, right: -1 },
+			parent: crows[n].parentNode 
+		});
+		createButton({
+			type: 'div',
+			title: 'Torrent download', 
+			target: crows[n].href,
+			className: 'automatedInline torrentLink',
+			onClick: requestDownloadResized,
+            style: { bottom: 23, right: -1 },
+			parent: crows[n].parentNode 
+		});
+		
+	}
+  
+  //button generation (minimal)
+	var rows = document.querySelectorAll('.gl3m > div > a'), n = rows.length;
+	while (n-- > 0) {
+		createButton({
+			type: 'div',
+			title: 'Automated Resized download',
+			target: rows[n].href,
+			className: 'automatedInline downloadLink',
+			onClick: requestDownloadResized,
+            style: { bottom: 0, right: 0 },
+			parent: rows[n].parentNode 
+		});
+		createButton({
+			type: 'div',
+			title: 'Torrent download', 
+			target: rows[n].href,
+			className: 'automatedInline torrentLink',
+			onClick: requestDownloadResized,
+            style: { bottom: 0, right: 23 },
+			parent: rows[n].parentNode 
+		});
+		
+	}
+
 	// button generation (gallery)
+	var krows = document.querySelectorAll('#gd5'), n = krows.length;
+	while (n --> 0) {
+		createButton({
+			type: 'div',
+			title: 'Automated resized download',
+			target: window.location.href,
+			className: 'automatedInline downloadLink',
+			onClick: requestDownloadResized,
+            style: { left: 23 },
+			parent: krows[n] 
+		});
+		createButton({
+			type: 'div',
+			title: 'Torrent download', 
+			target: window.location.href,
+			className: 'automatedInline torrentLink',
+			onClick: requestDownloadResized,
+            style: { left: 0 },
+			parent: krows[n] 
+		});
+	}
+	
 	/*
 	var bigThumbnail = document.querySelector('#gd1 > div');
 	if (bigThumbnail !== null) {
@@ -528,49 +625,8 @@ window.addEventListener('load', function() {
 		});
 	}
 	*/
-	
-	var krows = document.querySelectorAll('#gd5'), n = krows.length;
-	while (n --> 0) {
-		createButton({
-			type: 'div',
-			title: 'Automated resized download',
-			target: window.location.href,
-			className: 'automatedInline downloadLink',
-			onClick: requestDownloadResized,
-			parent: krows[n] 
-		});
-		createButton({
-			type: 'div',
-			title: 'Torrent download', 
-			target: window.location.href,
-			className: 'automatedInline torrentLink',
-			onClick: requestDownloadResized,
-			parent: krows[n] 
-		});
-	}
-	
-	// button generation (row list)
-	var rows = document.querySelectorAll('.it5 > a'), n = rows.length;
-	while (n-- > 0) {
-		createButton({
-			type: 'div',
-			title: 'Automated Resized download',
-			target: rows[n].href,
-			className: 'automatedInline downloadLink',
-			onClick: requestDownloadResized,
-			parent: rows[n].parentNode.previousSibling 
-		});
-		createButton({
-			type: 'div',
-			title: 'Torrent download', 
-			target: rows[n].href,
-			className: 'automatedInline torrentLink',
-			onClick: requestDownloadResized,
-			parent: rows[n].parentNode.previousSibling 
-		});
-		
-	}
-
+  
+  
 	// document style
 	var style = document.createElement('style');
 	style.innerHTML =
@@ -583,8 +639,7 @@ window.addEventListener('load', function() {
 		'.automatedPicker { background-image: ' + ASSETS.pickerIcon + '; }' +
 		'.automatedButton:hover, .automatedInline:hover { background-color: rgba(255,199,139,1) }' +
 		// Positioning
-		'.id3 > a, #gd1 > div { position: relative; display: flex; max-height: 100%; }' +
-		'#gd1 > div > .downloadLink { right: -1px !important; }' +
+		'#gd1 > div, .gl3t, .gl1e > div { position: relative; }' +
 		'div.it4 { position: absolute!important; right: 0px!important; }' + //compensating for buttons
 		'div.it5 { position: absolute!important; left: 48px!important; height: 14px !important;}' +
 		'div.i {  margin-left: -16px!important; }' + 
@@ -603,12 +658,13 @@ window.addEventListener('load', function() {
 		'.automatedButton.torrentLink  { border-radius: 0 0 0 5px !important; }' +
 		'#gd1 > div > .automatedButton { border-radius: 0 0 0 0 !important; }' +
 		'.automatedButton.working { font-size: 0px; }' +
-		'*:hover > .automatedButton, .automatedButton.working, .automatedButton.requested { display: block !important; }' +
+		'#gd1 > div:hover .automatedButton, .gl3t:hover .automatedButton, .gl1e > div:hover .automatedButton,' +
+		' .automatedButton.working, .automatedButton.requested { display: block !important; }' +
 		// Others (list mode)
 		'.automatedPicker { width: 16px; height: 16px; float: left; cursor: pointer; }' + 
 		'.automatedPicker > div { display: none; z-index: 2; position: absolute; top: -4px; text-align: center; }' +
 		'.automatedPicker:hover > div, .automatedPicker > div:hover { display: block; }' +
-		'.automatedInline { border: 1px solid black; width: 23px; height: 23px; display: inline-block; }' +
+		'.automatedInline { position: absolute; z-index: 2; border: 1px solid black; width: 23px; height: 23px; display: inline-block; }' +
 		'.automatedInline:first-child { border-right: none !important; }';
 	document.head.appendChild(style);
 
