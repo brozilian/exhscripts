@@ -3,7 +3,7 @@
 // @description	   When you hover over a gallery it shows the tags, pink for female blue for male. More compact. Also shows number of pages!
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.3
+// @version        1.4
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -117,9 +117,9 @@ https://greasyfork.org/en/scripts/21167-eh-tag-exposer-and-hider/code
 	}
 	var tags = new Array();
 	var titles = new Array();
-	$('.gl3m, .gl3c').css('z-index', '100'); //Semi-fix for EH Plus
-	$('.gl3m, .gl3c').mouseover(function() {
-		var index = parseInt($('.gl3m, .gl3c').index(this));
+	$('.gl3m, .gl3c, .gl3t').css('z-index', '100'); //Semi-fix for EH Plus
+	$('.gl3m, .gl3c, .gl3t').mouseover(function() {
+		var index = parseInt($('.gl3m, .gl3c, .gl3t').index(this));
 	/*	$(this).children().children().attr("title", "");
 		if (tags[index] == null) {
 			var gal_url = $(this).find('a:last').attr('href');
@@ -155,8 +155,8 @@ https://greasyfork.org/en/scripts/21167-eh-tag-exposer-and-hider/code
 		$('#info_div').hide();
 	});
 
-		$('.gl3m, .gl3c').each(function() {
-		var index = parseInt($('.gl3m, .gl3c').index(this));
+		$('.gl3m, .gl3c, .gl3t').each(function() {
+		var index = parseInt($('.gl3m, .gl3c, .gl3t').index(this));
 		$(this).children().children().attr("title", "");
 			var gal_url = $(this).find('a:last').attr('href');
 			$.ajax({
