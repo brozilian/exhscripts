@@ -3,7 +3,7 @@
 // @description	   When you hover over a gallery it shows the tags, pink for female blue for male. More compact. Also shows number of pages!
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.5
+// @version        1.6
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -15,8 +15,8 @@
 
 //CHANGE FONT SIZE HERE
 var fontSize = '9pt';
-
-
+//IF YOU WANT THE POPUP TO THE LEFT OF THE MOUSE SET to 1, IF RIGHT SET to 0
+var floatLeft = 0;
 
 /*
 v0.4.3.0
@@ -151,10 +151,11 @@ https://greasyfork.org/en/scripts/21167-eh-tag-exposer-and-hider/code
 		// comment out one of these variables in order to pick what method of displaying a window you prefer
 		//h = 200; // change this value to affect the height of the tags preview window. positive values move the window up. negative values move the window down
 		h = $('#info_div').height();
-
+          var sideoffset = 10;
+        if(floatLeft){sideoffset = -270;}
 		tempHeight = (pos.pageY-h);
 		$('#info_div').show()
-		.css('top', tempHeight).css('left', pos.pageX+10);
+		.css('top', tempHeight).css('left', pos.pageX + sideoffset);
 		}
 	}).mouseout(function() {
 		$('#info_div').html("Loading...");
