@@ -3,7 +3,7 @@
 // @description	   When you hover over a gallery it shows the tags, pink for female blue for male. More compact. Also shows number of pages!
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.4
+// @version        1.5
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -11,6 +11,11 @@
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // ==/UserScript==
 //Based off of DP's v0.4.3.0 https://sleazyfork.org/en/scripts/24442-custom-exhentai-g-e-hentai-tags-preview, remainder of comments from that version kept below
+
+
+//CHANGE FONT SIZE HERE
+var fontSize = '9pt';
+
 
 
 /*
@@ -99,6 +104,7 @@ https://greasyfork.org/en/scripts/21167-eh-tag-exposer-and-hider/code
 	.css('position', 'absolute')
 	.css('padding', '5px')
 	.css('z-index', '1000')
+	.css('font-size', fontSize)
 	.css('max-width', '250px')
 		if (window.location.toString().indexOf('e-hentai.org') >= 0) {
 		var color = "#5c0d11";
