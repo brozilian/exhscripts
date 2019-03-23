@@ -3,30 +3,39 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0.7
+// @version        1.0.8
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
 // @include        https://exhentai.org/*
 // @grant          GM_xmlhttpRequest
 // @grant          GM.xmlHttpRequest
+// @grant          GM_setValue
+// @grant          GM_getValue
+// @grant          GM.setValue
+// @grant          GM.getValue
 // @run-at         document-start
 // ==/UserScript==
 // 
 // Based on version 2.1.3 of E-Hentai Automated Downloads by etc see https://sleazyfork.org/en/scripts/1604-e-hentai-automated-downloads . Thanks to etc for the original.
 
+//
+// Settings can now be found at top of ehentai settings page and should persist through versions.
+//
+//
+//
+//
+//
+//
+//
+//
 
-// USER INPUT HERE
-
-var imageSizeLimit = 1500; //Set image size limit in KB here. Default is 1500 i.e. 1.5MB. 
-// If the average image size for a gallery is above this value, then the resized (1280x) gallery will be downloaded instead.
-// Resized torrents will also be downloaded.
-
-var downloadIfNoTorrentFound = true // Set to true to start a direct download if no appropriate torrent is available. Otherwise set to false. 
-
-
-// USER INPUT ENDS HERE
-
+if (typeof(GM_getValue) !== 'undefined') {var imageSizeLimit = GM_getValue('imageSizeLimit', 1500);}
+		else if (typeof(GM) !== 'undefined') var imageSizeLimit = GM.getValue('imageSizeLimit', 1500);
+		else reject(new Error('GM methods not working'));
+if (typeof(GM_getValue) !== 'undefined') {var downloadIfNoTorrentFound = GM_getValue('downloadIfNoTorrentFound', false);}
+		else if (typeof(GM) !== 'undefined') var downloadIfNoTorrentFound = GM.getValue('downloadIfNoTorrentFound', false);
+		else reject(new Error('GM methods not working'));
 
 if (typeof(Promise) === 'undefined') {
 	console.warn('Browser does not support promises, aborting.');
@@ -153,7 +162,11 @@ function handleFailure(data) {
 	if (!data) return;
 	var temp = (data.isTorrent ? torrentQueue[data.galleryId] : archiveQueue[data.galleryId]);
 	temp.button.className = temp.button.className.replace(/\s*working/, '');
-	if (data.error !== 'aborted')
+	if (data.error == 'could not find any suitable torrent' && downloadIfNoTorrentFound){
+  
+    temp.button.previousSibling.dispatchEvent(new MouseEvent("mouseup")); 
+      
+    }else if (data.error !== 'aborted')
 		alert('Could not complete operation.\nReason: ' + (data.error || 'unknown'));
 }
 
@@ -227,7 +240,7 @@ function obtainTorrentFile(data) {
 			if (size === 0 || size > (data.size * 1.05) || size > (imageSizeLimit * data.length) || seeds === 0 || (posted < data.date)) continue;
 			candidates.push({ link: link.href, date: posted, size: size, seeds: seeds });
 		}
-		if (candidates.length === 0) data.error = 'could not find any suitable torrent';
+        if (candidates.length === 0) data.error = 'could not find any suitable torrent';
 		else data.fileUrl = pickTorrent(candidates, data.date).link
 		if (data.error) return Promise.reject(data);
 		else return data;
@@ -401,17 +414,7 @@ function requestDownload(e) {
 	var tokens = e.target.getAttribute('target').match(/\/g\/(\d+)\/([0-9a-z]+)/i);
 	var galleryId = parseInt(tokens[1], 10), galleryToken = tokens[2];
 	var askConfirmation = (!isTorrent && e.which === 3);
-	if (!isTorrent) {
-		archiveQueue[galleryId] = { token: galleryToken, button: e.target };
-		var promise = obtainArchiverKey({ galleryId: galleryId, galleryToken: galleryToken, isTorrent: false });
-		if (askConfirmation) promise = promise.then(confirmDownloadRequest);
-		promise
-			.then(submitDownloadRequest)
-			.then(waitForDownloadLink)
-			.then(downloadFile)
-			.then(updateUI)
-			.catch(handleFailure);
-	} else {
+	if (isTorrent) {
 		// Try to find out gallery's last update date if possible
 		var galleryDate = xpathFind(document, 'td', 'Posted:'); // gallery page
 		if (galleryDate) galleryDate = galleryDate.nextSibling;
@@ -421,6 +424,18 @@ function requestDownload(e) {
 		// Gather data
 		torrentQueue[galleryId] = { token: galleryToken, button: e.target };
 		obtainTorrentFile({ galleryId: galleryId, galleryToken: galleryToken, isTorrent: true, date: galleryDate })
+			.then(downloadFile)
+			.then(updateUI)
+			.catch(handleFailure);
+		
+	} 
+    if(!isTorrent) {
+		archiveQueue[galleryId] = { token: galleryToken, button: e.target };
+		var promise = obtainArchiverKey({ galleryId: galleryId, galleryToken: galleryToken, isTorrent: false });
+		if (askConfirmation) promise = promise.then(confirmDownloadRequest);
+		promise
+			.then(submitDownloadRequest)
+			.then(waitForDownloadLink)
 			.then(downloadFile)
 			.then(updateUI)
 			.catch(handleFailure);
@@ -446,6 +461,14 @@ async function requestDownloadResized(e) {
 	} else {
 		var [galleryDate, gallerySize, galleryLength] = await getGalleryData(e.target.getAttribute('target'));
 	} 
+    if (isTorrent)  {
+		// Gather data
+		torrentQueue[galleryId] = { token: galleryToken, button: e.target };
+		obtainTorrentFile({ galleryId: galleryId, galleryToken: galleryToken, isTorrent: true, date: galleryDate , size: gallerySize, length: galleryLength })
+			.then(downloadFile)
+			.then(updateUI)
+			.catch(handleFailure);
+	}
 	if (!isTorrent) { 
 		if((gallerySize/galleryLength) < imageSizeLimit ){ 
 			archiveQueue[galleryId] = { token: galleryToken, button: e.target };
@@ -468,14 +491,7 @@ async function requestDownloadResized(e) {
 				.then(updateUI)
 				.catch(handleFailure);
 		}
-	} else {
-		// Gather data
-		torrentQueue[galleryId] = { token: galleryToken, button: e.target };
-		obtainTorrentFile({ galleryId: galleryId, galleryToken: galleryToken, isTorrent: true, date: galleryDate , size: gallerySize, length: galleryLength })
-			.then(downloadFile)
-			.then(updateUI)
-			.catch(handleFailure);
-	}
+	} 
 	return false;
 }
 
@@ -518,7 +534,7 @@ window.addEventListener('load', function() {
 			target: erows[n].href,
 			className: 'automatedInline downloadLink',
 			onClick: requestDownloadResized,
-            style: { bottom: 0, right: -51 },
+            style: { 'margin-left': 33 },
 			parent: erows[n].parentNode.parentNode.nextSibling.firstChild.firstChild.lastChild
 		});
 		createButton({
@@ -527,7 +543,7 @@ window.addEventListener('load', function() {
 			target: erows[n].href,
 			className: 'automatedInline torrentLink',
 			onClick: requestDownloadResized,
-            style: { bottom: 0, right: -28 },
+            style: {  'margin-left': 10 },
 			parent: erows[n].parentNode.parentNode.nextSibling.firstChild.firstChild.lastChild
 		});
 		
@@ -660,6 +676,7 @@ window.addEventListener('load', function() {
 		'.automatedButton.working { font-size: 0px; }' +
 		'#gd1 > div:hover .automatedButton, .gl3t:hover .automatedButton, .gl1e > div:hover .automatedButton,' +
 		' .automatedButton.working, .automatedButton.requested { display: block !important; }' +
+      //  ' .gl3e > .gldown > a {left: -30px; position: absolute;}' +
 		// Others (list mode)
 		'.automatedPicker { width: 16px; height: 16px; float: left; cursor: pointer; }' + 
 		'.automatedPicker > div { display: none; z-index: 2; position: absolute; top: -4px; text-align: center; }' +
@@ -668,4 +685,33 @@ window.addEventListener('load', function() {
 		'.automatedInline:first-child { border-right: none !important; }';
 	document.head.appendChild(style);
 
+  //store value for gallery size threshold
+  if (window.location.pathname == "/uconfig.php"){
+    var checkstate = '';
+    if(downloadIfNoTorrentFound){checkstate ='checked="true"';}
+    var settingsdiv = document.createElement('div');
+    settingsdiv.innerHTML = '<h2>Sensible sized E-Hentai Automated Downloads settings</h2><br><span>Image size limit in KB. Default is 1500 i.e. 1.5MB </span>' + 
+                            '<input id="imagesizeconfig" type="text" value=' + imageSizeLimit +' ><br><span>Start a direct download if no appropriate torrent is ' + 
+                            'available </span><input id="autodownload" type="checkbox" ' + checkstate  + '><br><input type="button" id="savescriptsettings" value="Save">'; 
+      
+    document.getElementById("outer").insertBefore(settingsdiv, document.getElementById("profile_outer"));
+    
+    document.getElementById("savescriptsettings").addEventListener("click", function(){
+      if (isNaN(document.getElementById("imagesizeconfig").value)){
+        alert('Needs to be a number');
+      } else if (typeof(GM_setValue) !== 'undefined') {
+        GM_setValue('downloadIfNoTorrentFound', document.getElementById("autodownload").checked);
+        GM_setValue('imageSizeLimit', document.getElementById("imagesizeconfig").value);
+      } else if (typeof(GM) !== 'undefined') {
+          GM.setValue('downloadIfNoTorrentFound', document.getElementById("autodownload").checked);
+          GM.setValue('imageSizeLimit', document.getElementById("imagesizeconfig").value);
+      } else reject(new Error('GM methods not working'));
+    })
+    
+  }
+  
+   
+  
+  
+  
 }, false);
