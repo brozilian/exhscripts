@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        2.0
+// @version        2.1
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -30,12 +30,29 @@
 //
 //
 
-if (typeof(GM_getValue) !== 'undefined') {var imageSizeLimit = GM_getValue('imageSizeLimit', 1500);}
-		else if (typeof(GM) !== 'undefined') var imageSizeLimit = GM.getValue('imageSizeLimit', 1500);
-		else reject(new Error('GM methods not working'));
-if (typeof(GM_getValue) !== 'undefined') {var downloadIfNoTorrentFound = GM_getValue('downloadIfNoTorrentFound', true);}
-		else if (typeof(GM) !== 'undefined') var downloadIfNoTorrentFound = GM.getValue('downloadIfNoTorrentFound', true);
-		else reject(new Error('GM methods not working'));
+
+if (typeof(GM_getValue) !== 'undefined') {var imageSizeLimit = GM_getValue('imageSizeLimit', 1500);
+                                          var downloadIfNoTorrentFound = GM_getValue('downloadIfNoTorrentFound', true);
+                                          var saveDownloadsAsVisits = GM_getValue('saveDownloadsAsVisits', false);}
+		else if (typeof(GM) !== 'undefined'){var imageSizeLimit = GM.getValue('imageSizeLimit', 1500);
+                                             var downloadIfNoTorrentFound = GM.getValue('downloadIfNoTorrentFound', true);
+                                             var saveDownloadsAsVisits = GM.getValue('saveDownloadsAsVisits', false);}
+		else reject(new Error('GM methods not working')); 
+
+
+var storageName = "ehVisited"; //name of object, to avoid clash with old installs
+
+if(localStorage.getItem(storageName) && saveDownloadsAsVisits){
+   var countDownloads = true;
+   var sto = localStorage.getItem(storageName);
+   var vis = JSON.parse(sto); 
+   function ehvStore(data) { 
+     var ccc = data.galleryId + "." + data.galleryToken;
+     vis["data"][ccc] = Date.now();
+     localStorage.setItem(storageName, JSON.stringify(vis));
+   }
+} else var countDownloads = false;
+
 
 if (typeof(Promise) === 'undefined') {
 	console.warn('Browser does not support promises, aborting.');
@@ -156,6 +173,9 @@ function updateUI(data) {
 	if (!data || data.error) return;
 	var temp = (data.isTorrent ? torrentQueue[data.galleryId] : archiveQueue[data.galleryId]);
 	temp.button.className = temp.button.className.replace(/\s*working/, '') + ' requested';
+    
+    if (countDownloads) ehvStore(data);
+  
 }
 
 function handleFailure(data) {
@@ -687,12 +707,16 @@ window.addEventListener('load', function() {
 
   //store value for gallery size threshold
   if (window.location.pathname == "/uconfig.php"){
-    var checkstate = '';
-    if(downloadIfNoTorrentFound){checkstate ='checked="true"';}
+    var sdcheckstate = '';
+    if(downloadIfNoTorrentFound){sdcheckstate ='checked="true"';}
+    var ehcheckstate = '';
+    if(saveDownloadsAsVisits){ehcheckstate ='checked="true"';}
     var settingsdiv = document.createElement('div');
+    var ehvisitedsetting = '<span>Count downloaded galleries in E-H Visited script (requires https://sleazyfork.org/en/scripts/377945-e-h-visited )</span><input id="ehvisitedcountdownloads" type="checkbox" ' + ehcheckstate  + '><br>';
+    
     settingsdiv.innerHTML = '<h2>Sensible sized E-Hentai Automated Downloads settings</h2><br><span>Image size limit in KB. Default is 1500 i.e. 1.5MB </span>' + 
                             '<input id="imagesizeconfig" type="text" value=' + imageSizeLimit +' ><br><span>Start a direct download if no appropriate torrent is ' + 
-                            'available </span><input id="autodownload" type="checkbox" ' + checkstate  + '><br><input type="button" id="savescriptsettings" value="Save">'; 
+                            'available </span><input id="autodownload" type="checkbox" ' + sdcheckstate  + '><br>' + ehvisitedsetting + '<input type="button" id="savescriptsettings" value="Save">'; 
       
     document.getElementById("outer").insertBefore(settingsdiv, document.getElementById("profile_outer"));
     
@@ -701,9 +725,11 @@ window.addEventListener('load', function() {
         alert('Needs to be a number');
       } else if (typeof(GM_setValue) !== 'undefined') {
         GM_setValue('downloadIfNoTorrentFound', document.getElementById("autodownload").checked);
+        GM_setValue('saveDownloadsAsVisits', document.getElementById("ehvisitedcountdownloads").checked);
         GM_setValue('imageSizeLimit', document.getElementById("imagesizeconfig").value);
       } else if (typeof(GM) !== 'undefined') {
           GM.setValue('downloadIfNoTorrentFound', document.getElementById("autodownload").checked);
+          GM.setValue('saveDownloadsAsVisits', document.getElementById("ehvisitedcountdownloads").checked);
           GM.setValue('imageSizeLimit', document.getElementById("imagesizeconfig").value);
       } else reject(new Error('GM methods not working'));
     })
