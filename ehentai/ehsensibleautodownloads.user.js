@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        1.0.8
+// @version        2.0
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -33,8 +33,8 @@
 if (typeof(GM_getValue) !== 'undefined') {var imageSizeLimit = GM_getValue('imageSizeLimit', 1500);}
 		else if (typeof(GM) !== 'undefined') var imageSizeLimit = GM.getValue('imageSizeLimit', 1500);
 		else reject(new Error('GM methods not working'));
-if (typeof(GM_getValue) !== 'undefined') {var downloadIfNoTorrentFound = GM_getValue('downloadIfNoTorrentFound', false);}
-		else if (typeof(GM) !== 'undefined') var downloadIfNoTorrentFound = GM.getValue('downloadIfNoTorrentFound', false);
+if (typeof(GM_getValue) !== 'undefined') {var downloadIfNoTorrentFound = GM_getValue('downloadIfNoTorrentFound', true);}
+		else if (typeof(GM) !== 'undefined') var downloadIfNoTorrentFound = GM.getValue('downloadIfNoTorrentFound', true);
 		else reject(new Error('GM methods not working'));
 
 if (typeof(Promise) === 'undefined') {
