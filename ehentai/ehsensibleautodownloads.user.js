@@ -3,7 +3,7 @@
 // @description    A modified version of E-Hentai Automated Downloads by etc. that selects between resized and uncompressed archives based on size and also ignores out of date torrents.
 // @namespace      https://greasyfork.org/users/212175-brozilian
 // @author         brozilian
-// @version        2.2
+// @version        2.3
 // @include        http://e-hentai.org/*
 // @include        https://e-hentai.org/*
 // @include        http://exhentai.org/*
@@ -42,15 +42,17 @@ var apiurl = "https://" + window.location.host + "/api.php";
 
 var storageName = "ehVisited"; //name of object, to avoid clash with old installs
 
-if (localStorage.getItem(storageName) && saveDownloadsAsVisits) {
-	var countDownloads = true;
-	var sto = localStorage.getItem(storageName);
-	var vis = JSON.parse(sto);
-	function ehvStore(data) {
+function ehvStore(data) {
+      	var sto = localStorage.getItem(storageName);
+	    var vis = JSON.parse(sto);
 		var ccc = data.galleryId + "." + data.galleryToken;
 		vis["data"][ccc] = Date.now();
 		localStorage.setItem(storageName, JSON.stringify(vis));
+        return;
 	}
+if (localStorage.getItem(storageName) && saveDownloadsAsVisits) {
+	var countDownloads = true;
+ 
 } else
 	var countDownloads = false;
 
@@ -191,9 +193,8 @@ function updateUI(data) {
 	var temp = (data.isTorrent ? torrentQueue[data.galleryId] : archiveQueue[data.galleryId]);
 	temp.button.className = temp.button.className.replace(/\s*working/, '') + ' requested';
 
-	if (countDownloads)
-		ehvStore(data);
-
+	if (countDownloads){
+      ehvStore(data);}
 }
 
 function handleFailure(data) {
@@ -659,9 +660,9 @@ UI Setup
 
 window.addEventListener('load', function () {
 
-	document.querySelectorAll('.gl3m, .gl3c, .gl1e').forEach((button) => {
-		button.onclick = null
-	});
+	// document.querySelectorAll('.gl3m, .gl3c, .gl1e').forEach((button) => {
+	// 	button.onclick = null
+	// });
 
 	// button generation (thumbnail)
 	var thumbnails = document.querySelectorAll('.gl3t'),
@@ -721,7 +722,7 @@ window.addEventListener('load', function () {
 	}
 
 	// button generation (compact)
-	var crows = document.querySelectorAll('.gl3c > div > a'),
+	var crows = document.querySelectorAll('.gl3c  > a'),
 	n = crows.length;
 	while (n-- > 0) {
 		createButton({
@@ -751,8 +752,8 @@ window.addEventListener('load', function () {
 
 	}
 
-	//button generation (minimal)
-	var rows = document.querySelectorAll('.gl3m > div > a'),
+	//button generation (minimal and minimal+)
+	var rows = document.querySelectorAll('.gl3m  > a'),
 	n = rows.length;
 	while (n-- > 0) {
 		createButton({
@@ -846,9 +847,9 @@ window.addEventListener('load', function () {
 		//  ' .gl3e > .gldown > a {left: -30px; position: absolute;}' +
 		// Others (list mode)
 		'.automatedPicker { width: 16px; height: 16px; float: left; cursor: pointer; }' +
-		'.automatedPicker > div { display: none; z-index: 2; position: absolute; top: -4px; text-align: center; }' +
+		'.automatedPicker > div { display: none; z-index: 100; position: absolute; top: -4px; text-align: center; }' +
 		'.automatedPicker:hover > div, .automatedPicker > div:hover { display: block; }' +
-		'.automatedInline { position: absolute; z-index: 2; border: 1px solid black; width: 23px; height: 23px; display: inline-block; }' +
+		'.automatedInline { position: absolute; z-index: 100; border: 1px solid black; width: 23px; height: 23px; display: inline-block; }' +
 		'.automatedInline:first-child { border-right: none !important; }';
 	document.head.appendChild(style);
 
